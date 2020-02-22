@@ -83,6 +83,9 @@ def run(args: argparse.Namespace):
         rasa.run(**vars(args))
         return
 
+    args.actions = args.actions or DEFAULT_ACTIONS_PATH
+
+
     # if the API is not enable you cannot start without a model
     # make sure either a model server, a remote storage, or a local model is
     # configured

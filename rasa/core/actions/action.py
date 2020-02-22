@@ -2,7 +2,11 @@ import copy
 import json
 import logging
 import typing
-from typing import List, Text, Optional, Dict, Any, Generator
+import importlib
+import pkgutil
+
+from typing import List, Text, Optional, Dict, Any, Generator, Type
+import types
 
 import aiohttp
 
@@ -101,7 +105,7 @@ def combine_with_templates(
 
 
 def action_from_name(
-    name: Text, action_endpoint: Optional[EndpointConfig], user_actions: List[Text]
+    name: Text, action_path: Optional[Text], action_endpoint: Optional[EndpointConfig], user_actions: List[Text]
 ) -> "Action":
     """Return an action instance for the name."""
 
@@ -113,19 +117,22 @@ def action_from_name(
         return ActionUtterTemplate(name)
     elif name.startswith(RESPOND_PREFIX):
         return ActionRetrieveResponse(name)
-    else:
+    elif action_endpoint is not None:
         return RemoteAction(name, action_endpoint)
-
+    else:
+        CustomActions.load_actions(action_path)
+        return CustomActions.find_custom_action(name)
 
 def actions_from_names(
     action_names: List[Text],
+    action_path: Optional[Text],
     action_endpoint: Optional[EndpointConfig],
     user_actions: List[Text],
 ) -> List["Action"]:
     """Converts the names of actions into class instances."""
 
     return [
-        action_from_name(name, action_endpoint, user_actions) for name in action_names
+        action_from_name(name, action_path, action_endpoint, user_actions) for name in action_names
     ]
 
 
@@ -642,6 +649,68 @@ class ActionRevertFallbackEvents(Action):
         else:
             return []
 
+
+class CustomActions:
+    actions = {}
+
+    @classmethod
+    def load_actions(cls, action_path: Union[Text, types.ModuleType]):
+        if len(cls.actions) > 0:
+            return
+        
+        try:
+            cls._import_submodules(action_path)
+        except ImportError:
+            logger.exception(f"Failed to register package '{action_path}'.")
+
+        actions = cls._all_subclasses(Action)
+
+        for action in actions:
+            meta = action.__dict__.get("Meta", False)
+            abstract = getattr(meta, "abstract", False)
+            if (
+                not action.__module__.startswith("rasa_core.")
+                and not action.__module__.startswith("rasa.")
+                and not action.__module__.startswith("rasa_sdk.")
+                and not action.__module__.startswith("rasa_core_sdk.")
+                and not abstract
+            ):
+                cls.actions[action.name()] = action
+
+    @staticmethod
+    def find_custom_action(name: Text) -> "Action":
+        return CustomActions.actions[name]
+
+    @classmethod
+    def _all_subclasses(clz, cls: Any) -> List[Any]:
+        """Returns all known (imported) subclasses of a class."""
+
+        return cls.__subclasses__() + [
+            g for s in cls.__subclasses__() for g in clz._all_subclasses(s)
+        ]
+
+    @classmethod
+    def _import_submodules(cls,
+            package: Union[Text, types.ModuleType], recursive: bool = True
+        ) -> None:
+            """ Import all submodules of a module, recursively, including
+            subpackages
+
+            :param package: package (name or actual module)
+            :type package: str | module
+            :rtype: dict[str, types.ModuleType]
+            """
+            if isinstance(package, str):
+                package = importlib.import_module(package)
+            if not getattr(package, "__path__", None):
+                return
+
+            results = {}
+            for loader, name, is_pkg in pkgutil.walk_packages(package.__path__):
+                full_name = package.__name__ + "." + name
+                results[full_name] = importlib.import_module(full_name)
+                if recursive and is_pkg:
+                    cls._import_submodules(full_name)
 
 def has_user_affirmed(tracker: "DialogueStateTracker") -> bool:
     return tracker.last_executed_action_has(ACTION_DEFAULT_ASK_AFFIRMATION_NAME)

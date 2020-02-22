@@ -14,6 +14,7 @@ if typing.TYPE_CHECKING:
 
 def run(
     model: Text,
+    actions: Text,
     endpoints: Text,
     connector: Text = None,
     credentials: Text = None,
@@ -50,6 +51,7 @@ def run(
     kwargs = utils.minimal_kwargs(kwargs, rasa.core.run.serve_application)
     rasa.core.run.serve_application(
         model,
+        actions,
         channel=connector,
         credentials=credentials,
         endpoints=_endpoints,

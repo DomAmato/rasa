@@ -224,6 +224,7 @@ async def schedule_model_pulling(
 
 async def load_agent(
     model_path: Optional[Text] = None,
+    action_path: Optional[Text] = None,
     model_server: Optional[EndpointConfig] = None,
     remote_storage: Optional[Text] = None,
     interpreter: Optional[NaturalLanguageInterpreter] = None,
@@ -266,6 +267,7 @@ async def load_agent(
                 generator=generator,
                 tracker_store=tracker_store,
                 lock_store=lock_store,
+                action_path=action_path,
                 action_endpoint=action_endpoint,
                 model_server=model_server,
                 remote_storage=remote_storage,
@@ -295,6 +297,7 @@ class Agent:
         generator: Union[EndpointConfig, NaturalLanguageGenerator, None] = None,
         tracker_store: Optional[TrackerStore] = None,
         lock_store: Optional[LockStore] = None,
+        action_path: Optional[Text] = None,
         action_endpoint: Optional[EndpointConfig] = None,
         fingerprint: Optional[Text] = None,
         model_directory: Optional[Text] = None,
@@ -320,6 +323,7 @@ class Agent:
         self.nlg = NaturalLanguageGenerator.create(generator, self.domain)
         self.tracker_store = self.create_tracker_store(tracker_store, self.domain)
         self.lock_store = self._create_lock_store(lock_store)
+        self.action_path = action_path
         self.action_endpoint = action_endpoint
 
         self._set_fingerprint(fingerprint)
@@ -355,6 +359,7 @@ class Agent:
     def load(
         cls,
         model_path: Text,
+        action_path: Optional[Text] = None,
         interpreter: Optional[NaturalLanguageInterpreter] = None,
         generator: Union[EndpointConfig, NaturalLanguageGenerator] = None,
         tracker_store: Optional[TrackerStore] = None,
@@ -403,6 +408,7 @@ class Agent:
             generator=generator,
             tracker_store=tracker_store,
             lock_store=lock_store,
+            action_path=action_path,
             action_endpoint=action_endpoint,
             model_directory=model_path,
             model_server=model_server,
@@ -844,6 +850,7 @@ class Agent:
             self.domain,
             self.tracker_store,
             self.nlg,
+            action_path=self.action_path,
             action_endpoint=self.action_endpoint,
             message_preprocessor=preprocessor,
         )
@@ -906,6 +913,7 @@ class Agent:
     @staticmethod
     def load_local_model(
         model_path: Text,
+        action_path: Optional[Text] = None,
         interpreter: Optional[NaturalLanguageInterpreter] = None,
         generator: Union[EndpointConfig, NaturalLanguageGenerator] = None,
         tracker_store: Optional[TrackerStore] = None,
@@ -932,6 +940,7 @@ class Agent:
             generator=generator,
             tracker_store=tracker_store,
             lock_store=lock_store,
+            action_path=action_path,
             action_endpoint=action_endpoint,
             model_server=model_server,
             remote_storage=remote_storage,

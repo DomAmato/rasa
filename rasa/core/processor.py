@@ -70,6 +70,7 @@ class MessageProcessor:
         domain: Domain,
         tracker_store: TrackerStore,
         generator: NaturalLanguageGenerator,
+        action_path: Optional[Text] = None,
         action_endpoint: Optional[EndpointConfig] = None,
         max_number_of_predictions: int = MAX_NUMBER_OF_PREDICTIONS,
         message_preprocessor: Optional[LambdaType] = None,
@@ -84,6 +85,7 @@ class MessageProcessor:
         self.message_preprocessor = message_preprocessor
         self.on_circuit_break = on_circuit_break
         self.action_endpoint = action_endpoint
+        self.action_path = action_path
 
     async def handle_message(
         self, message: UserMessage
@@ -301,7 +303,7 @@ class MessageProcessor:
 
         max_confidence_index = int(np.argmax(action_confidences))
         action = self.domain.action_for_index(
-            max_confidence_index, self.action_endpoint
+            max_confidence_index, self.action_path, self.action_endpoint
         )
 
         logger.debug(
@@ -450,7 +452,7 @@ class MessageProcessor:
                 )
 
     def _get_action(self, action_name) -> Optional[Action]:
-        return self.domain.action_for_name(action_name, self.action_endpoint)
+        return self.domain.action_for_name(action_name, self.action_path, self.action_endpoint)
 
     async def _parse_message(self, message, tracker: DialogueStateTracker = None):
         # for testing - you can short-cut the NLU part with a message

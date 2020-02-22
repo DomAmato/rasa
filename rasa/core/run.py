@@ -144,6 +144,7 @@ def configure_app(
 
 def serve_application(
     model_path: Optional[Text] = None,
+    action_path: Optional[Text] = None,
     channel: Optional[Text] = None,
     port: int = constants.DEFAULT_SERVER_PORT,
     credentials: Optional[Text] = None,
@@ -195,7 +196,7 @@ def serve_application(
     )
 
     app.register_listener(
-        partial(load_agent_on_start, model_path, endpoints, remote_storage),
+        partial(load_agent_on_start, model_path, action_path, endpoints, remote_storage),
         "before_server_start",
     )
 
@@ -222,6 +223,7 @@ def serve_application(
 # noinspection PyUnusedLocal
 async def load_agent_on_start(
     model_path: Text,
+    action_path: Text,
     endpoints: AvailableEndpoints,
     remote_storage: Optional[Text],
     app: Sanic,
@@ -249,6 +251,7 @@ async def load_agent_on_start(
 
     app.agent = await agent.load_agent(
         model_path,
+        action_path,
         model_server=model_server,
         remote_storage=remote_storage,
         interpreter=_interpreter,
