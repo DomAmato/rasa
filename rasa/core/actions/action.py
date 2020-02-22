@@ -652,10 +652,12 @@ class ActionRevertFallbackEvents(Action):
 
 class CustomActions:
     actions = {}
+    logger = logging.getLogger(__name__)
 
     @classmethod
     def load_actions(cls, action_path: Union[Text, types.ModuleType]):
         if len(cls.actions) > 0:
+            logger.info('Actions already loaded, skipping')
             return
         
         try:
@@ -675,10 +677,12 @@ class CustomActions:
                 and not action.__module__.startswith("rasa_core_sdk.")
                 and not abstract
             ):
+                logger.info(f'Loading action {action.name()}')
                 cls.actions[action.name()] = action
 
     @staticmethod
     def find_custom_action(name: Text) -> "Action":
+        logger.info(f'Custom actions available are: {CustomActions.actions.keys()}')
         return CustomActions.actions[name]
 
     @classmethod
