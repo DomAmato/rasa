@@ -1,6 +1,7 @@
 import copy
 import json
 import logging
+import inspect
 import typing
 import importlib
 import pkgutil
@@ -677,8 +678,15 @@ class CustomActions:
                 and not action.__module__.startswith("rasa_core_sdk.")
                 and not abstract
             ):
-                logger.info(f'Loading action {action.name()}')
-                cls.actions[action.name()] = action
+                if inspect.isclass(action):
+                    if action.__module__.startswith("rasa."):
+                        logger.warning(f"Skipping built in Action {action}.")
+                        return
+                    else:
+                        action = action()
+                if isinstance(action, Action):
+                    logger.info(f'Loading action {action}')
+                    cls.actions[action.name()] = action
 
     @staticmethod
     def find_custom_action(name: Text) -> "Action":
