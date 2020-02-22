@@ -83,7 +83,7 @@ def run(args: argparse.Namespace):
         rasa.run(**vars(args))
         return
 
-    args.actions = args.actions or DEFAULT_ACTIONS_PATH
+    args.actions = get_validated_path(args.actions, "actions", DEFAULT_ACTIONS_PATH, True)
 
 
     # if the API is not enable you cannot start without a model

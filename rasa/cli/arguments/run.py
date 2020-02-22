@@ -70,6 +70,11 @@ def add_server_arguments(parser: argparse.ArgumentParser):
         help="Set the remote location where your Rasa model is stored, e.g. on AWS.",
     )
     server_arguments.add_argument(
+        "--actions",
+        type=str,
+        help="Set the location where your local actions are stored, .",
+    )
+    server_arguments.add_argument(
         "--ssl-certificate",
         help="Set the SSL Certificate to create a TLS secured server.",
     )
