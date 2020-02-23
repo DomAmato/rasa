@@ -721,7 +721,7 @@ class CustomActions:
                 full_name = package.__name__ + "." + name
                 try:
                     results[full_name] = importlib.import_module(full_name)
-                except ModuleNotFoundError
+                except ModuleNotFoundError:
                     continue 
                 if recursive and is_pkg:
                     cls._import_submodules(full_name)
