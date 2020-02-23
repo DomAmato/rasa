@@ -72,7 +72,7 @@ def add_server_arguments(parser: argparse.ArgumentParser):
     server_arguments.add_argument(
         "--actions",
         type=str,
-        help="Set the location where your local actions are stored, .",
+        help="Set the location where your local actions are stored.",
     )
     server_arguments.add_argument(
         "--ssl-certificate",

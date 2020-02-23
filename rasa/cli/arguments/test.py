@@ -47,6 +47,19 @@ def add_test_core_argument_group(
         default=DEFAULT_RESULTS_PATH,
         help_text="Output path for any files created during the evaluation.",
     )
+    parser.add_argument(
+        "--e2e",
+        "--end-to-end",
+        action="store_true",
+        help="Run an end-to-end evaluation for combined action and "
+        "intent prediction. Requires a story file in end-to-end "
+        "format.",
+    )
+    parser.add_argument(
+        "--actions",
+        type=str,
+        help="Set the location where your local actions are stored.",
+    )
     if include_e2e_argument:
         parser.add_argument(
             "--e2e",

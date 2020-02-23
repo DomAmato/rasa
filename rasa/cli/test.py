@@ -7,6 +7,7 @@ from rasa.cli.arguments import test as arguments
 from rasa.constants import (
     DEFAULT_CONFIG_PATH,
     DEFAULT_DATA_PATH,
+    DEFAULT_ACTIONS_PATH,
     DEFAULT_E2E_TESTS_PATH,
     DEFAULT_ENDPOINTS_PATH,
     DEFAULT_MODELS_PATH,
@@ -69,6 +70,8 @@ def run_core_test(args: argparse.Namespace) -> None:
     stories = cli_utils.get_validated_path(args.stories, "stories", DEFAULT_DATA_PATH)
     stories = data.get_core_directory(stories)
     output = args.out or DEFAULT_RESULTS_PATH
+
+    args.actions = cli_utils.get_validated_path(args.actions, "actions", DEFAULT_ACTIONS_PATH, True)
 
     io_utils.create_directory(output)
 
