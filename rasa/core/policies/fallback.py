@@ -146,7 +146,7 @@ class FallbackPolicy(Policy):
 
         if (
             tracker.latest_action_name == self.fallback_action_name
-            and tracker.latest_action_name != ACTION_LISTEN_NAME
+            and self.fallback_action_name != ACTION_LISTEN_NAME
         ):
             logger.debug(
                 "Predicted 'action_listen' after fallback action '{}'".format(
