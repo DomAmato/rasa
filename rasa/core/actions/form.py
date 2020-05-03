@@ -421,7 +421,7 @@ class FormAction(Action):
         return await self.validate_slots(slot_values, output_channel, nlg, tracker, domain)
 
     # noinspection PyUnusedLocal
-    def request_next_slot(
+    async def request_next_slot(
         self,
         output_channel: "OutputChannel",
         nlg: "NaturalLanguageGenerator",
@@ -605,7 +605,7 @@ class FormAction(Action):
                 if e["event"] == "slot":
                     temp_tracker.slots[e["name"]] = e["value"]
 
-            next_slot_events = self.request_next_slot(output_channel, nlg, temp_tracker, domain)
+            next_slot_events = await self.request_next_slot(output_channel, nlg, temp_tracker, domain)
 
             if next_slot_events is not None:
                 # request next slot
