@@ -184,7 +184,9 @@ class FormAction(Action):
 
         mapping_intents = requested_slot_mapping.get("intent", [])
         mapping_not_intents = requested_slot_mapping.get("not_intent", [])
-        intent = tracker.latest_message.get("intent", {}).get("name")
+        intent = ''
+        if tracker.latest_message.intent:
+            intent = tracker.latest_message.intent.get("name")
 
         intent_not_blacklisted = (
             not mapping_intents and intent not in mapping_not_intents
