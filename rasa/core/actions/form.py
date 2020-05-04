@@ -216,8 +216,8 @@ class FormAction(Action):
         matching_values = self.get_entity_value(
             requested_slot_mapping.get("entity"),
             tracker,
-            requested_slot_mapping.get("role"),
-            requested_slot_mapping.get("group"),
+            role=requested_slot_mapping.get("role"),
+            group=requested_slot_mapping.get("group"),
         )
         slot_fulfils_entity_mapping = matching_values is not None
 
@@ -243,7 +243,7 @@ class FormAction(Action):
         """
         # list is used to cover the case of list slot type
         value = list(
-            tracker.get_latest_entity_values(name, entity_group=group, entity_role=role)
+            tracker.get_latest_entity_values(name, entity_role=role, entity_group=group)
         )
         if len(value) == 0:
             value = None
