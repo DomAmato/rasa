@@ -603,9 +603,10 @@ class FormAction(Action):
 
             # create temp tracker with populated slots from `validate` method
             temp_tracker = tracker.copy()
-            for e in events:
-                if e["event"] == "slot":
-                    temp_tracker.slots[e["name"]] = e["value"]
+            for event in events:
+                event_dict = event.as_dict()
+                if event_dict["event"] == "slot":
+                    temp_tracker.slots[event_dict["name"]] = event_dict["value"]
 
             next_slot_events = await self.request_next_slot(output_channel, nlg, temp_tracker, domain)
 
